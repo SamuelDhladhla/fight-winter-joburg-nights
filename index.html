@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Studio Bananaaaa — FIGHT WINTER: JOBURG NIGHTS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --paper: #F2EDE3;
+    --ink: #0A0A0A;
+    --blue: #2F5FA8;
+    --red:  #D93B3B;
+    --cream: #EDE4D0;
+  }
+
+  html, body {
+    width: 100%; min-height: 100%;
+    background: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--ink);
+    overflow-x: hidden;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 20px 12px 40px;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    background-image: radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size: 3px 3px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .header {
+    width: 100%; max-width: 860px;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 8px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 2px;
+    font-weight: 700; text-transform: uppercase;
+    position: relative; z-index: 2;
+  }
+  .header .logo { font-size: 14px; letter-spacing: 3px; }
+  .header .round-badge {
+    padding: 4px 10px;
+    background: var(--ink); color: var(--paper);
+  }
+
+  #wrap {
+    position: relative;
+    width: 100%; max-width: 860px;
+    aspect-ratio: 16 / 7;
+    background: var(--cream);
+    border: 3px solid var(--ink);
+    box-shadow: 8px 8px 0 var(--ink);
+    z-index: 2;
+    overflow: hidden;
+  }
+
+  canvas {
+    display: block;
+    width: 100%; height: 100%;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+
+  #wrap::after {
+    content: "";
+    position: absolute; inset: 0;
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0 1px, transparent 1px 3px),
+      radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.2) 100%);
+    pointer-events: none;
+    mix-blend-mode: multiply;
+  }
+
+  .overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    background: var(--paper);
+    padding: 16px;
+    z-index: 5;
+    transition: opacity 0.3s;
+    overflow-y: auto;
+  }
+  .overlay.hidden { opacity: 0; pointer-events: none; }
+
+  .select-head {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: clamp(14px, 2.2vw, 20px);
+    letter-spacing: 4px;
+    text-align: center; color: var(--ink);
+  }
+
+  .select-main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 4px;
+    min-height: 0;
+    margin-top: 8px;
+  }
+
+  .arrow-btn {
+    background: var(--ink); color: var(--paper);
+    border: none; width: 32px; height: 48px;
+    font-size: 18px; font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer; transition: transform 0.1s;
+  }
+  .arrow-btn:active { transform: scale(0.9); }
+
+  .fighter-card {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 14px;
+    align-items: center;
+    height: 100%;
+    padding: 4px 8px;
+  }
+  @media (max-width: 560px) {
+    .fighter-card { grid-template-columns: 1fr; gap: 6px; padding: 2px; }
+    .fighter-portrait canvas { max-height: 90px !important; }
+    .fighter-stats { font-size: 9px !important; }
+  }
+
+  .fighter-portrait {
+    display: flex; align-items: center; justify-content: center;
+  }
+  .fighter-portrait canvas {
+    width: auto; max-width: 100%; height: 100%; max-height: 150px;
+    image-rendering: pixelated;
+  }
+
+  .fighter-stats {
+    display: flex; flex-direction: column;
+    gap: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .stat-row {
+    padding: 5px 9px;
+    color: var(--paper);
+    display: flex; justify-content: space-between;
+    gap: 6px;
+    white-space: nowrap; overflow: hidden;
+  }
+  .stat-row .k { opacity: 0.75; font-weight: 400; }
+  .stat-row .v { font-weight: 800; }
+
+  .start-btn {
+    margin: 10px auto 4px;
+    background: var(--ink); color: var(--paper);
+    border: none;
+    padding: 10px 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800; letter-spacing: 4px;
+    font-size: 13px; cursor: pointer;
+    box-shadow: 4px 4px 0 var(--red);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .start-btn:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--red); }
+  .start-btn:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 var(--red); }
+
+
+  .player-name-input {
+    margin: 10px auto 2px;
+    display: block;
+    width: min(280px, 82%);
+    padding: 10px 12px;
+    border: 2px solid var(--ink);
+    background: rgba(255,255,255,0.72);
+    color: var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-align: center;
+    text-transform: uppercase;
+    outline: none;
+  }
+  .player-name-input::placeholder {
+    color: rgba(10,10,10,0.45);
+  }
+
+  .select-foot {
+    text-align: center;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--ink);
+    opacity: 0.6;
+    margin-top: 6px;
+  }
+
+  .hud {
+    position: absolute;
+    top: 10px; left: 10px; right: 10px;
+    display: flex; justify-content: space-between;
+    align-items: flex-start;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800; letter-spacing: 2px;
+    pointer-events: none; z-index: 4;
+  }
+  .hud .block {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    padding: 4px 8px;
+  }
+  .hud .block .lbl {
+    display: block; font-size: 8px;
+    letter-spacing: 3px; font-weight: 700;
+    opacity: 0.6; line-height: 1.1;
+  }
+  .hud .block .val { font-size: 14px; }
+  .hud .round { background: var(--ink); color: var(--paper); }
+  .hud .round .lbl { opacity: 0.7; }
+
+  #announce {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none; z-index: 4;
+  }
+  #announce .banner {
+    background: var(--ink); color: var(--paper);
+    padding: 14px 40px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800; letter-spacing: 8px;
+    font-size: clamp(22px, 5vw, 40px);
+    border: 4px solid var(--paper);
+    box-shadow: 0 0 0 4px var(--ink);
+    transform: scale(0);
+    transition: transform 0.25s cubic-bezier(.5,1.8,.5,1);
+  }
+  #announce.show .banner { transform: scale(1); }
+
+  .ko-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: clamp(22px, 6vw, 44px);
+    letter-spacing: 6px;
+    text-align: center; color: var(--red);
+    margin-top: 10px;
+  }
+  .ko-sub {
+    text-align: center; font-size: 10px;
+    letter-spacing: 3px; color: var(--ink);
+    opacity: 0.7; margin-top: 4px;
+  }
+  .ko-stats {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; margin: 12px auto; max-width: 400px; width: 100%;
+  }
+  .ko-stat {
+    background: var(--ink); color: var(--paper);
+    padding: 8px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    text-align: center;
+  }
+  .ko-stat .lbl { font-size: 9px; letter-spacing: 3px; opacity: 0.7; }
+  .ko-stat .val { font-size: 20px; font-weight: 800; letter-spacing: 2px; }
+
+  .leaderboard {
+    max-width: 400px; width: 100%;
+    margin: 4px auto 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 1px;
+  }
+  .leaderboard h3 {
+    text-align: center; font-size: 10px;
+    letter-spacing: 4px; font-weight: 800;
+    padding: 4px 0; margin-bottom: 2px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .lb-row {
+    display: grid;
+    grid-template-columns: 20px 1fr auto auto;
+    gap: 8px; padding: 3px 6px;
+    border-bottom: 1px dashed rgba(0,0,0,0.15);
+    font-weight: 700;
+  }
+  .lb-row.mine { background: var(--ink); color: var(--paper); font-weight: 800; }
+  .lb-row .rank { opacity: 0.5; }
+
+  .btn-row {
+    display: flex; gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .btn-row .start-btn { margin: 4px; font-size: 11px; padding: 8px 20px; letter-spacing: 3px; }
+
+  .ctrls {
+    position: absolute;
+    bottom: 8px; left: 0; right: 0;
+    text-align: center;
+    font-size: 9px; letter-spacing: 3px;
+    opacity: 0.4; z-index: 3;
+    pointer-events: none; font-weight: 700;
+  }
+
+
+  .rotate-overlay {
+    position: fixed; inset: 0;
+    display: none;
+    align-items: center; justify-content: center;
+    background: rgba(242, 237, 227, 0.97);
+    z-index: 20;
+    padding: 24px;
+    text-align: center;
+  }
+  .rotate-card {
+    border: 3px solid var(--ink);
+    box-shadow: 8px 8px 0 var(--ink);
+    background: var(--paper);
+    padding: 22px 18px;
+    max-width: 320px;
+  }
+  .rotate-title {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+  }
+  .rotate-copy {
+    font-size: 10px;
+    letter-spacing: 2px;
+    line-height: 1.7;
+    opacity: 0.8;
+  }
+  .phone-icon {
+    width: 44px; height: 70px;
+    border: 3px solid var(--ink);
+    margin: 0 auto 14px;
+    position: relative;
+    animation: rotatePhone 1.8s ease-in-out infinite;
+    transform-origin: center center;
+  }
+  .phone-icon::before {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border: 2px solid var(--ink);
+  }
+  .phone-icon::after {
+    content: "";
+    position: absolute;
+    width: 10px; height: 3px;
+    background: var(--ink);
+    top: 4px; left: 50%;
+    transform: translateX(-50%);
+  }
+  @keyframes rotatePhone {
+    0%, 20% { transform: rotate(0deg); }
+    45%, 80% { transform: rotate(90deg); }
+    100% { transform: rotate(90deg); }
+  }
+  @media (max-width: 820px) and (orientation: portrait) {
+    .rotate-overlay.show { display: flex; }
+  }
+
+  footer {
+    width: 100%; max-width: 860px;
+    display: flex; justify-content: space-between;
+    padding: 16px 8px 0;
+    font-size: 9px; letter-spacing: 3px;
+    font-weight: 700; opacity: 0.6;
+    z-index: 2; position: relative;
+  }
+
+
+  @media (max-width: 820px) {
+    body { padding: 12px 8px 24px; }
+    .header { padding: 2px 4px 10px; font-size: 9px; letter-spacing: 1.5px; }
+    .header .logo { font-size: 11px; letter-spacing: 2px; }
+    .header .round-badge { padding: 4px 8px; font-size: 9px; }
+    footer { font-size: 7px; letter-spacing: 2px; padding-top: 10px; }
+  }
+
+  @keyframes shake {
+    0%,100% { transform: translate(0,0); }
+    25% { transform: translate(-4px, 2px); }
+    50% { transform: translate(3px, -2px); }
+    75% { transform: translate(-2px, -3px); }
+  }
+  .shake { animation: shake 0.3s; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">STUDIO BANANAAAA<span style="color:var(--red)">.</span></div>
+  <div class="round-badge">FW25 · JOBURG NIGHTS</div>
+</div>
+
+<div id="wrap">
+  <canvas id="game" width="640" height="280"></canvas>
+
+  <div class="hud" id="hud" style="display:none">
+    <div class="block"><span class="lbl">SCORE</span><span class="val" id="score">0000</span></div>
+    <div class="block round"><span class="lbl">ROUND</span><span class="val" id="round">1</span></div>
+    <div class="block"><span class="lbl">LOSSES TO WINTER</span><span class="val" id="losses">0</span></div>
+  </div>
+
+  <div id="announce"><div class="banner" id="announce-text">ROUND 1</div></div>
+
+  <div class="overlay" id="select-screen">
+    <div class="select-head">CHOOSE YOUR FIGHTER.</div>
+    <div class="select-main">
+      <button class="arrow-btn" id="prev-fighter">◄</button>
+      <div class="fighter-card">
+        <div class="fighter-portrait">
+          <canvas id="portrait" width="130" height="170"></canvas>
+        </div>
+        <div class="fighter-stats" id="stats"></div>
+      </div>
+      <button class="arrow-btn" id="next-fighter">►</button>
+    </div>
+    <input id="player-name" class="player-name-input" maxlength="12" placeholder="ENTER YOUR NAME" />
+    <button class="start-btn" id="start-btn">FIGHT</button>
+    <div class="select-foot">SPACE · TAP · CLICK TO JUMP · M TO TOGGLE SOUND</div>
+  </div>
+
+  <div class="overlay hidden" id="ko-screen">
+    <div class="select-head">WINTER WINS BY KO.</div>
+    <div class="ko-title" id="ko-title">KNOCKOUT</div>
+    <div class="ko-sub" id="ko-sub">YOU FELL IN ROUND 1</div>
+    <div class="ko-stats">
+      <div class="ko-stat"><div class="lbl">FINAL SCORE</div><div class="val" id="ko-score">0</div></div>
+      <div class="ko-stat"><div class="lbl">ALL-TIME BEST</div><div class="val" id="ko-best">0</div></div>
+    </div>
+    <div class="leaderboard">
+      <h3>◆ HALL OF FAME ◆</h3>
+      <div id="lb-list"></div>
+    </div>
+    <div class="btn-row">
+      <button class="start-btn" id="again-btn">REMATCH</button>
+      <button class="start-btn" id="switch-btn" style="box-shadow: 4px 4px 0 var(--blue);">SWITCH FIGHTER</button>
+    </div>
+  </div>
+
+  <div class="ctrls" id="ctrls" style="display:none">SPACE · TAP · CLICK = JUMP · M = SOUND · M = SOUND</div>
+</div>
+
+
+<div class="rotate-overlay" id="rotate-overlay" aria-hidden="true">
+  <div class="rotate-card">
+    <div class="phone-icon"></div>
+    <div class="rotate-title">TURN YOUR SCREEN.</div>
+    <div class="rotate-copy">FIGHT WINTER PLAYS BEST IN LANDSCAPE ON MOBILE.</div>
+  </div>
+</div>
+
+<footer>
+  <span>© STUDIO BANANAAAA</span>
+  <span>STUDIOBANANAAA.COM</span>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ══════════════════════════════════════════════════════════════════════════════
+// STUDIO BANANAAAA — FIGHT WINTER
+// A JHB endless runner where knitwear-fighters battle the cold.
+// ══════════════════════════════════════════════════════════════════════════════
+
+const CW = 640, CH = 280;
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+
+const GROUND_Y = CH - 50;
+const SUPABASE_URL = "https://uvktcnfhtdjesgiwxgmx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_3Rl25Ap1vqXlOxqpL2fDog_ai1MY73t";
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+// PIXEL ART PALETTE ───────────────────────────────────────────────────────────
+const PAL = {
+  '.': null,
+  'K': '#0A0A0A',
+  'R': '#D93B3B',
+  'r': '#9E2222',
+  'B': '#2F5FA8',
+  'b': '#1E4275',
+  'S': '#B07038',
+  'D': '#7A4820',
+  'W': '#F2EDE3',
+  'w': '#D4CDB8',
+  'Y': '#F0C000',
+  'I': '#B8D4E8',
+  'o': '#FFFFFF',
+  'G': '#5F6F5A',
+};
+
+// FIGHTER SPRITES ──────────────────────────────────────────────────────────────
+// Portrait (front-facing, gloves up) + running animation (side profile)
+
+const RADEBE = {
+  id: 'radebe',
+  name: 'COMBINATION RADEBE',
+  birthplace: 'SOWETO',
+  weight: '1.25 KG',
+  material: '100% WOOL',
+  color: '#2F5FA8',
+  textColor: '#F2EDE3',
+
+  portrait: [
+    '.......KKKKKKK.......',
+    '......KRRRRRRRK......',
+    '......KKKKKKKKK......',
+    '......KSSSSSSSK......',
+    '.RRR..DSS...SSSD..RRR',
+    'RRRRR.DSSKKKKSSD.RRRR',
+    'RRRRR.DSDDDDDDSD.RRRR',
+    'RRRRR..DSSSSSSD..RRRR',
+    '.RRR...DKKDDDKKD..RRR',
+    '.......KKKKKKK.......',
+    '......BBBBBBBBB......',
+    '.....BBBBBBBBBBB.....',
+    '....BBBwwwwwwwBBB....',
+    '....BBwWWWWWWwBB.....',
+    '....BBwWWWWWWwBB.....',
+    '....BBwKKKKKKKwBB....',
+    '....BBwKKKKKKKwBB....',
+    '....BBwWWWWWWwBB.....',
+    '....KKbbbbbbbbbKK....',
+    '....KK.........KK....',
+  ],
+
+  run1: [
+    '......KKKKKKK...',
+    '.....KRRRRRRRK..',
+    '.....KKKKKKKKK..',
+    '.....KSSSSSSSK..',
+    '.....DSS.KSSSK..',
+    '.....DSSSKSSSK..',
+    '......DSSSSSK...',
+    '.......KKKKK....',
+    '....RR.BBBBB.RR.',
+    '...RRRRBBBBBRRRR',
+    '...RRRRBBBBBRRRR',
+    '....RR.BBBBB.RR.',
+    '.......BBBBB....',
+    '......bBBBBBb...',
+    '......bWWWWWb...',
+    '......KWWWWWK...',
+    '.......KKKKK....',
+    '......KK..KK....',
+    '.....KK....KK...',
+    '....KK......K...',
+    '...KKK......KK..',
+    '.KKKKK.......KKK',
+  ],
+
+  run2: [
+    '......KKKKKKK...',
+    '.....KRRRRRRRK..',
+    '.....KKKKKKKKK..',
+    '.....KSSSSSSSK..',
+    '.....DSS.KSSSK..',
+    '.....DSSSKSSSK..',
+    '......DSSSSSK...',
+    '.......KKKKK....',
+    '...RR..BBBBB..RR',
+    '..RRRR.BBBBB.RRR',
+    '..RRRR.BBBBB.RRR',
+    '...RR..BBBBB..RR',
+    '.......BBBBB....',
+    '......bBBBBBb...',
+    '......bWWWWWb...',
+    '......KWWWWWK...',
+    '.......KKKKK....',
+    '........KKK.....',
+    '.......KK.K.....',
+    '......KK..KK....',
+    '.....KK....KK...',
+    '....KKK.....KKK.',
+  ],
+};
+
+const DLAMINI = {
+  id: 'dlamini',
+  name: 'RIGHT HOOK DLAMINI',
+  birthplace: 'SOWETO',
+  weight: '1.55 KG',
+  material: '100% ALIZE WOOL',
+  color: '#0A0A0A',
+  textColor: '#F2EDE3',
+
+  portrait: [
+    '.......KKKKKKK.......',
+    '......KKKKKKKKK......',
+    '......KSSSSSSSK......',
+    '.RRR..DSS...SSSD..RRR',
+    'RRRRR.DSSKKKKSSD.RRRR',
+    'RRRRR.DSDDDDDDSD.RRRR',
+    'RRRRR..DSSSSSSD..RRRR',
+    '.RRR...DKKDDDKKD..RRR',
+    '.......KKKKKKK.......',
+    '......KKKWWWKKK......',
+    '.....KKKKWWWKKKK.....',
+    '....KKKKKWWWKKKKK....',
+    '....KKKWWWWWWWKKK....',
+    '....KKKWKKKKKWKKK....',
+    '....KKKWKYYYKWKKK....',
+    '....KKKWKKKKKWKKK....',
+    '....KKKWWWWWWWKKK....',
+    '....KK.........KK....',
+    '....KK.........KK....',
+    '....KKK.......KKK....',
+  ],
+
+  run1: [
+    '......KKKKKKK...',
+    '.....KKKKKKKKK..',
+    '.....KSSSSSSSK..',
+    '.....DSS.KSSSK..',
+    '.....DSSSKSSSK..',
+    '......DSSSSSK...',
+    '.......KKKKK....',
+    '.....KWWWWWK....',
+    '....RRKWWWWKRR..',
+    '...RRRRKKKKKRRRR',
+    '...RRRRKKKKKRRRR',
+    '....RRRKKKKKRRR.',
+    '.......KKKKK....',
+    '......KKWWKKK...',
+    '......KKWWKKK...',
+    '......KKKKKKK...',
+    '.......KK.KK....',
+    '.......KK..KK...',
+    '......KK...KK...',
+    '.....KK.....K...',
+    '....KKK.....KK..',
+    '.KKKKK.......KKK',
+  ],
+
+  run2: [
+    '......KKKKKKK...',
+    '.....KKKKKKKKK..',
+    '.....KSSSSSSSK..',
+    '.....DSS.KSSSK..',
+    '.....DSSSKSSSK..',
+    '......DSSSSSK...',
+    '.......KKKKK....',
+    '.....KWWWWWK....',
+    '...RR.KWWWWK.RR.',
+    '..RRRRKKKKKKRRR.',
+    '..RRRRKKKKKKRRR.',
+    '...RR.KKKKKK.RR.',
+    '.......KKKKK....',
+    '......KKWWKKK...',
+    '......KKWWKKK...',
+    '......KKKKKKK...',
+    '........KKK.....',
+    '.......KK.K.....',
+    '......KK..KK....',
+    '.....KK....KK...',
+    '....KKK.....KKK.',
+    '...KKK........KK',
+  ],
+};
+
+const FIGHTERS = [RADEBE, DLAMINI];
+let selectedIdx = 0;
+let fighter = FIGHTERS[0];
+
+// OBSTACLE SPRITES ─────────────────────────────────────────────────────────────
+const ICICLE = [
+  '.KIK.',
+  '.KIK.',
+  '.KIK.',
+  '.KII.',
+  '.KIK.',
+  '.KI..',
+  '..K..',
+];
+
+const SNOWPILE = [
+  '...WWWWWWWW...',
+  '..WWWWWwwwWWW.',
+  '.WWwwwwwwwwwWW',
+  'WwwwwwwwwwwwwW',
+  'wwwwwwwwwwwwww',
+  'wwww.wwwww.www',
+  'wwwwwwwwwwwwww',
+];
+
+const TAXI = [
+  '...YYYYYYYYYYYYYYYY....',
+  '..YKKKKKKKKKKKKKKKKY...',
+  '.YKKKWWKKKKKKKKWWKKKY..',
+  '.YKKKWWKKKKKKKKWWKKKY..',
+  '.YKKKKKKKKKKKKKKKKKKY..',
+  '.YYYYYYYYYYYYYYYYYYYY..',
+  '.YYKKKKKKKKKKKKKKKKYY..',
+  '..KKo...........oKK....',
+  '..KK.............KK....',
+  '...KK...........KK.....',
+];
+
+const BIN = [
+  '...KKKKK...',
+  '..KGGGGGK..',
+  '..KGGGGGK..',
+  '..KGGGGGK..',
+  '..KGGGGGK..',
+  '..KGGGGGK..',
+  '..KKKKKKK..',
+  '...K...K...',
+];
+
+const POTHOLE = [
+  '....KKKKKKKK....',
+  '..KKKKKKKKKKKK..',
+  '.KKKIIIIIIIIKKK.',
+  '.KKIIIIIIIIIIKK.',
+  '.KKKIIIIIIIIKKK.',
+  '..KKKKKKKKKKKK..',
+];
+
+const WINDGUST = [
+  '...III....III....',
+  '.IIIIII..IIIIII..',
+  'IIIIIIIIIIIIIIII.',
+  '..IIIIIIIIIIII...',
+  '....IIIIIIII.....',
+];
+
+// SPRITE RENDERER ──────────────────────────────────────────────────────────────
+function drawSprite(sprite, x, y, scale = 3, targetCtx = ctx) {
+  for (let row = 0; row < sprite.length; row++) {
+    const line = sprite[row];
+    for (let col = 0; col < line.length; col++) {
+      const ch = line[col];
+      const color = PAL[ch];
+      if (!color) continue;
+      targetCtx.fillStyle = color;
+      targetCtx.fillRect(x + col * scale, y + row * scale, scale, scale);
+    }
+  }
+}
+
+// BACKGROUND — WINTER JOBURG ──────────────────────────────────────────────────
+const BUILDINGS = [];
+function genCity() {
+  BUILDINGS.length = 0;
+  let x = 0;
+  while (x < CW * 3) {
+    const w = 18 + Math.floor(Math.random() * 44);
+    const h = 40 + Math.floor(Math.random() * (GROUND_Y * 0.55));
+    BUILDINGS.push({ x, w, h, windows: Math.random() > 0.3, tall: h > GROUND_Y * 0.4, seed: Math.random() });
+    x += w + 3 + Math.floor(Math.random() * 6);
+  }
+  BUILDINGS.push({ x: CW * 1.1, w: 28, h: Math.floor(GROUND_Y * 0.7), ponte: true, seed: 0.5 });
+  BUILDINGS.push({ x: CW * 1.7, w: 18, h: Math.floor(GROUND_Y * 0.8), carlton: true, seed: 0.5 });
+}
+genCity();
+
+let bgScroll = 0;
+let cityScroll = 0;
+
+function mix(a, b, t) {
+  return a + (b - a) * t;
+}
+
+function rgb(obj) {
+  return `rgb(${obj.r|0},${obj.g|0},${obj.b|0})`;
+}
+
+function rgba(obj, alpha) {
+  return `rgba(${obj.r|0},${obj.g|0},${obj.b|0},${alpha})`;
+}
+
+function getSkyPhase() {
+  return Math.min(1, score / 2600);
+}
+
+function drawBackground() {
+  const phase = getSkyPhase();
+  const top = { r: mix(184, 18, phase), g: mix(196, 26, phase), b: mix(216, 54, phase) };
+  const mid = { r: mix(208, 48, phase), g: mix(216, 62, phase), b: mix(224, 98, phase) };
+  const bottom = { r: mix(232, 10, phase), g: mix(228, 22, phase), b: mix(216, 40, phase) };
+
+  const grad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
+  grad.addColorStop(0, rgb(top));
+  grad.addColorStop(0.55, rgb(mid));
+  grad.addColorStop(1, rgb(bottom));
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, CW, GROUND_Y);
+
+  const sunX = mix(CW * 0.76, CW * 0.2, phase);
+  const sunY = mix(48, 84, phase);
+  const sunRadius = mix(24, 16, phase);
+  const sunAlpha = mix(0.5, 0.18, phase);
+  ctx.fillStyle = `rgba(255, 220, 180, ${sunAlpha})`;
+  ctx.beginPath();
+  ctx.arc(sunX, sunY, sunRadius, 0, Math.PI * 2);
+  ctx.fill();
+
+  if (phase > 0.45) {
+    ctx.fillStyle = `rgba(245,245,255,${(phase - 0.45) * 0.9})`;
+    ctx.beginPath();
+    ctx.arc(CW * 0.78, 52, 10 + phase * 6, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  drawSkyline(cityScroll * 0.25, 0.35 + phase * 0.5, 0.42 + phase * 0.12, phase);
+  drawSkyline(cityScroll * 0.6, phase * 0.25, 0.88, phase);
+
+  if (phase > 0.55) {
+    for (let i = 0; i < 22; i++) {
+      const x = (i * 53 + 17) % CW;
+      const y = (i * 29 + 13) % Math.max(60, GROUND_Y - 80);
+      const twinkle = 0.3 + 0.4 * Math.sin(frame * 0.03 + i);
+      ctx.fillStyle = `rgba(255,255,255,${(phase - 0.55) * twinkle})`;
+      ctx.fillRect(x, y, 1.5, 1.5);
+    }
+  }
+
+  const mistAlpha = mix(0.35, 0.18, phase);
+  ctx.fillStyle = `rgba(240, 240, 240, ${mistAlpha})`;
+  ctx.fillRect(0, GROUND_Y * 0.58, CW, GROUND_Y * 0.28);
+}
+
+function drawSkyline(scroll, darken, alpha, phase = 0) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  const offset = scroll % (CW * 1.5);
+
+  BUILDINGS.forEach(b => {
+    let bx = b.x - offset;
+    // Wrap
+    while (bx > CW + 50) bx -= CW * 3;
+    while (bx < -100) bx += CW * 3;
+    if (bx < -100 || bx > CW + 50) return;
+
+    const scaledH = b.h * (1 - darken * 0.2);
+    const by = GROUND_Y - scaledH;
+
+    if (b.ponte) {
+      const mix = Math.floor(80 - darken * 50 - phase * 18);
+      ctx.fillStyle = `rgb(${mix},${mix+5},${mix+20})`;
+      ctx.fillRect(bx, by, b.w, scaledH);
+      ctx.fillStyle = `rgba(180,200,220,${0.4 - phase * 0.15})`;
+      ctx.fillRect(bx + 4, by, b.w - 8, 10);
+      for (let i = 0; i < 7; i++) {
+        for (let j = 0; j < 3; j++) {
+          ctx.fillStyle = ((i + j + Math.floor(b.seed * 10)) % 3 !== 0) ? `rgba(255,200,100,${0.28 + phase * 0.42})` : `rgba(20,20,30,${0.55 + phase * 0.3})`;
+          ctx.fillRect(bx + 4 + j * 7, by + 14 + i * 10, 4, 5);
+        }
+      }
+    } else if (b.carlton) {
+      const mix = Math.floor(70 - darken * 40 - phase * 16);
+      ctx.fillStyle = `rgb(${mix},${mix},${mix+15})`;
+      ctx.fillRect(bx, by, b.w, scaledH);
+      ctx.fillRect(bx + b.w/2 - 1, by - 16, 2, 16);
+      for (let i = 0; i < 11; i++) {
+        for (let j = 0; j < 2; j++) {
+          ctx.fillStyle = ((i + j) % 3 !== 0) ? `rgba(255,220,140,${0.3 + phase * 0.5})` : `rgba(20,20,30,${0.45 + phase * 0.35})`;
+          ctx.fillRect(bx + 3 + j * 6, by + 4 + i * 9, 4, 5);
+        }
+      }
+    } else {
+      const shade = Math.floor(75 + b.seed * 30 - darken * 40 - phase * 14);
+      ctx.fillStyle = `rgb(${shade},${shade+5},${shade+15})`;
+      ctx.fillRect(bx, by, b.w, scaledH);
+      if (b.windows) {
+        const cols = Math.max(1, Math.floor(b.w / 7));
+        const rows = Math.max(1, Math.floor(scaledH / 10));
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (((i * 7 + j * 11 + Math.floor(b.seed * 100)) % 3) !== 0) {
+              ctx.fillStyle = `rgba(255,210,140,${0.18 + phase * 0.45})`;
+              ctx.fillRect(bx + 2 + j * 7, by + 3 + i * 10, 3, 5);
+            }
+          }
+        }
+      }
+      // Snow on roof
+      ctx.fillStyle = `rgba(255,255,255,${0.7 - phase * 0.25})`;
+      ctx.fillRect(bx, by - 2, b.w, 3);
+    }
+  });
+  ctx.restore();
+}
+
+function drawGround() {
+  const phase = getSkyPhase();
+  const grad = ctx.createLinearGradient(0, GROUND_Y, 0, CH);
+  grad.addColorStop(0, `rgb(${mix(122, 44, phase)|0}, ${mix(122, 52, phase)|0}, ${mix(136, 78, phase)|0})`);
+  grad.addColorStop(1, `rgb(${mix(74, 18, phase)|0}, ${mix(74, 22, phase)|0}, ${mix(88, 38, phase)|0})`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, GROUND_Y, CW, CH - GROUND_Y);
+
+  ctx.fillStyle = `rgba(200,220,240,${0.3 - phase * 0.1})`;
+  ctx.fillRect(0, GROUND_Y, CW, 5);
+
+  // Road markings
+  const dashW = 30, gap = 20;
+  const off = Math.floor((bgScroll * 2) % (dashW + gap));
+  ctx.fillStyle = phase > 0.55 ? '#D8C36A' : '#E8D080';
+  for (let x = -off; x < CW + dashW; x += dashW + gap) {
+    ctx.fillRect(x, GROUND_Y + 22, dashW, 3);
+  }
+
+  // Frost patches
+  ctx.fillStyle = `rgba(255,255,255,${0.15 + phase * 0.05})`;
+  for (let i = 0; i < 8; i++) {
+    const fx = ((i * 110) - Math.floor(bgScroll * 1.5) % 110 + CW) % CW;
+    ctx.fillRect(fx, GROUND_Y + 4, 50, 2);
+  }
+}
+
+// SNOW PARTICLES ───────────────────────────────────────────────────────────────
+const SNOW = Array.from({ length: 80 }, () => ({
+  x: Math.random() * CW,
+  y: Math.random() * CH,
+  vy: 0.4 + Math.random() * 1.2,
+  r: Math.random() < 0.7 ? 1 : 2,
+  drift: Math.random() * Math.PI * 2,
+}));
+
+function updateDrawSnow() {
+  SNOW.forEach(s => {
+    s.drift += 0.03;
+    s.x += Math.sin(s.drift) * 0.3 - (state === 'playing' ? gameSpeed * 0.3 : 0.1);
+    s.y += s.vy;
+    if (s.x < -5) s.x = CW + 5;
+    if (s.x > CW + 10) s.x = -5;
+    if (s.y > CH) { s.y = -5; s.x = Math.random() * CW + 50; }
+    ctx.fillStyle = `rgba(255,255,255,${s.r === 2 ? 0.9 : 0.6})`;
+    ctx.fillRect(Math.floor(s.x), Math.floor(s.y), s.r, s.r);
+  });
+}
+
+// STEAM FROM FIGHTER ───────────────────────────────────────────────────────────
+let steam = [];
+function updateSteam() {
+  if (frame % 15 === 0 && state === 'playing') {
+    steam.push({ x: player.x + 18, y: player.y - player.h + 8, life: 1, r: 2 });
+  }
+  steam = steam.filter(s => s.life > 0);
+  steam.forEach(s => {
+    s.y -= 0.4;
+    s.x -= gameSpeed * 0.2;
+    s.r += 0.12;
+    s.life -= 0.025;
+    ctx.fillStyle = `rgba(240,240,240,${s.life * 0.6})`;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+
+// AUDIO ────────────────────────────────────────────────────────────────────────
+let audioEnabled = true;
+let audioCtx = null;
+let trafficGain = null;
+let trafficFilter = null;
+let trafficSource = null;
+let trafficInterval = null;
+let audioBooted = false;
+
+function getAudioCtx() {
+  if (!audioCtx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    audioCtx = new AC();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function tone(freq = 440, duration = 0.08, type = 'square', volume = 0.03, start = 0) {
+  if (!audioEnabled) return;
+  const ac = getAudioCtx();
+  if (!ac) return;
+  const t = ac.currentTime + start;
+  const osc = ac.createOscillator();
+  const gain = ac.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, t);
+  gain.gain.setValueAtTime(0.0001, t);
+  gain.gain.exponentialRampToValueAtTime(volume, t + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+  osc.connect(gain);
+  gain.connect(ac.destination);
+  osc.start(t);
+  osc.stop(t + duration + 0.03);
+}
+
+function playJumpSound() {
+  tone(420, 0.06, 'square', 0.025, 0);
+  tone(620, 0.07, 'square', 0.018, 0.025);
+}
+
+function playRoundSound() {
+  tone(330, 0.08, 'sawtooth', 0.028, 0);
+  tone(440, 0.09, 'sawtooth', 0.026, 0.08);
+  tone(660, 0.12, 'square', 0.03, 0.16);
+}
+
+function playKoSound() {
+  tone(240, 0.18, 'sawtooth', 0.03, 0);
+  tone(180, 0.22, 'triangle', 0.03, 0.1);
+  tone(120, 0.28, 'square', 0.02, 0.22);
+}
+
+function playMilestoneSound() {
+  tone(700, 0.06, 'square', 0.02, 0);
+  tone(900, 0.08, 'square', 0.018, 0.05);
+}
+
+function playTaxiHoot() {
+  if (!audioEnabled) return;
+  tone(420, 0.14, 'square', 0.012, 0);
+  tone(350, 0.18, 'square', 0.01, 0.11);
+}
+
+function ensureTrafficAmbience() {
+  if (!audioEnabled) return;
+  const ac = getAudioCtx();
+  if (!ac || trafficGain) return;
+
+  trafficGain = ac.createGain();
+  trafficGain.gain.value = 0.012;
+
+  trafficFilter = ac.createBiquadFilter();
+  trafficFilter.type = 'lowpass';
+  trafficFilter.frequency.value = 550;
+
+  const noiseBuffer = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
+  const data = noiseBuffer.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.45;
+
+  trafficSource = ac.createBufferSource();
+  trafficSource.buffer = noiseBuffer;
+  trafficSource.loop = true;
+  trafficSource.connect(trafficFilter);
+  trafficFilter.connect(trafficGain);
+  trafficGain.connect(ac.destination);
+  trafficSource.start();
+
+  if (!trafficInterval) {
+    trafficInterval = setInterval(() => {
+      if (state === 'playing' && audioEnabled && Math.random() > 0.6) playTaxiHoot();
+    }, 7000);
+  }
+}
+
+function updateSoundLabel() {
+  const ctrls = document.getElementById('ctrls');
+  if (ctrls) ctrls.textContent = `SPACE · TAP · CLICK = JUMP · M = SOUND ${audioEnabled ? 'ON' : 'OFF'}`;
+}
+
+function bootAudio() {
+  if (audioBooted) return;
+  audioBooted = true;
+  ensureTrafficAmbience();
+  updateSoundLabel();
+}
+
+function toggleAudio() {
+  audioEnabled = !audioEnabled;
+  if (audioEnabled) {
+    const ac = getAudioCtx();
+    if (ac && ac.state === 'suspended') ac.resume();
+    ensureTrafficAmbience();
+  } else if (audioCtx) {
+    audioCtx.suspend();
+  }
+  updateSoundLabel();
+}
+
+// PLAYER ───────────────────────────────────────────────────────────────────────
+const player = {
+  x: 80,
+  y: GROUND_Y,
+  w: 48,
+  h: 66,
+  vy: 0,
+  onGround: true,
+  jumps: 0,
+  legFrame: 0,
+  dead: false,
+
+  jump() {
+    if (this.jumps < 2 && !this.dead) {
+      this.vy = this.jumps === 0 ? -12 : -9;
+      playJumpSound(this.jumps > 0);
+      this.jumps++;
+      this.onGround = false;
+      playJumpSound();
+      bootAudio();
+    }
+  },
+
+  reset() {
+    this.y = GROUND_Y; this.vy = 0; this.onGround = true;
+    this.jumps = 0; this.dead = false;
+  },
+
+  update() {
+    if (!this.onGround) {
+      this.vy += 0.6;
+      this.y += this.vy;
+    }
+    if (this.y >= GROUND_Y) {
+      this.y = GROUND_Y;
+      this.vy = 0;
+      this.onGround = true;
+      this.jumps = 0;
+    }
+    if (state === 'playing' && this.onGround) this.legFrame += 0.3;
+  },
+
+  draw() {
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath();
+    ctx.ellipse(this.x + this.w/2, GROUND_Y + 2, 20, 4, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    const runSprite = Math.floor(this.legFrame) % 2 === 0 ? fighter.run1 : fighter.run2;
+    const spriteH = runSprite.length * 3;
+
+    if (this.dead) {
+      // KO pose — fallen over
+      ctx.save();
+      ctx.translate(this.x + this.w/2, this.y - 15);
+      ctx.rotate(-Math.PI / 2.2);
+      drawSprite(runSprite, -this.w/2, -spriteH/2, 3);
+      ctx.restore();
+    } else {
+      drawSprite(runSprite, this.x, this.y - spriteH, 3);
+    }
+  }
+};
+
+// OBSTACLES ────────────────────────────────────────────────────────────────────
+let obstacles = [];
+let spawnTimer = 90;
+
+function spawnObstacle() {
+  const types = round === 1 ? ['snowpile', 'bin', 'pothole']
+              : round === 2 ? ['snowpile', 'icicle_low', 'bin', 'pothole', 'windgust']
+              : round === 3 ? ['snowpile', 'icicle_low', 'icicle', 'bin', 'taxi', 'windgust']
+              : ['snowpile', 'icicle_low', 'icicle', 'double_snow', 'icicle_snow', 'taxi', 'bin', 'pothole', 'windgust'];
+  const type = types[Math.floor(Math.random() * types.length)];
+  let ob;
+  switch (type) {
+    case 'icicle':
+      ob = { type, x: CW + 20, y: GROUND_Y - 42, w: 15, h: 42, hit: false };
+      break;
+    case 'icicle_low':
+      ob = { type, x: CW + 20, y: GROUND_Y - 28, w: 15, h: 28, hit: false };
+      break;
+    case 'snowpile':
+      ob = { type, x: CW + 20, y: GROUND_Y - 18, w: 42, h: 18, hit: false };
+      break;
+    case 'double_snow':
+      ob = { type, x: CW + 20, y: GROUND_Y - 18, w: 72, h: 18, hit: false };
+      break;
+    case 'icicle_snow':
+      ob = { type, x: CW + 20, y: GROUND_Y - 42, w: 60, h: 42, hit: false };
+      break;
+    case 'taxi':
+      ob = { type, x: CW + 20, y: GROUND_Y - 30, w: 72, h: 30, hit: false };
+      break;
+    case 'bin':
+      ob = { type, x: CW + 20, y: GROUND_Y - 24, w: 26, h: 24, hit: false };
+      break;
+    case 'pothole':
+      ob = { type, x: CW + 20, y: GROUND_Y - 12, w: 48, h: 12, hit: false };
+      break;
+    case 'windgust':
+      ob = { type, x: CW + 20, y: GROUND_Y - 36, w: 54, h: 20, hit: false };
+      break;
+  }
+  obstacles.push(ob);
+}
+
+function drawMbawulaSmoke(ob) {
+  if (frame % 8 === 0 && state === 'playing') {
+    ob.smoke.push({ x: ob.x + 15, y: ob.y - 2, life: 1, r: 2 });
+  }
+  ob.smoke = ob.smoke.filter(s => s.life > 0);
+  ob.smoke.forEach(s => {
+    s.x -= gameSpeed * 0.15 - 0.05;
+    s.y -= 0.35;
+    s.r += 0.08;
+    s.life -= 0.03;
+    ctx.fillStyle = `rgba(190,190,190,${s.life * 0.45})`;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function drawTaxiSlush(ob) {
+  drawSprite(TAXI, ob.x, ob.y - 2, 3);
+  ctx.fillStyle = 'rgba(210,230,255,0.55)';
+  for (let i = 0; i < 3; i++) {
+    const sx = ob.x - 8 - i * 8;
+    ctx.fillRect(sx, GROUND_Y - 4 - i, 6, 2);
+    ctx.fillRect(sx - 4, GROUND_Y - 2 + i, 5, 2);
+  }
+}
+
+function drawObstacles() {
+  obstacles.forEach(ob => {
+    switch (ob.type) {
+      case 'icicle':
+        drawSprite(ICICLE, ob.x, ob.y, 3);
+        break;
+      case 'icicle_low':
+        drawSprite(ICICLE, ob.x, ob.y, 2);
+        break;
+      case 'snowpile':
+        drawSprite(SNOWPILE, ob.x, ob.y, 3);
+        break;
+      case 'double_snow':
+        drawSprite(SNOWPILE, ob.x, ob.y, 3);
+        drawSprite(SNOWPILE, ob.x + 40, ob.y, 3);
+        break;
+      case 'icicle_snow':
+        drawSprite(SNOWPILE, ob.x, ob.y + 24, 3);
+        drawSprite(ICICLE, ob.x + 44, ob.y, 3);
+        break;
+      case 'taxi':
+        drawSprite(TAXI, ob.x, ob.y, 3);
+        break;
+      case 'bin':
+        drawSprite(BIN, ob.x, ob.y, 3);
+        break;
+      case 'pothole':
+        drawSprite(POTHOLE, ob.x, ob.y, 3);
+        break;
+      case 'windgust':
+        drawSprite(WINDGUST, ob.x, ob.y, 3);
+        break;
+    }
+  });
+}
+
+function checkCollision(ob) {
+  const px = player.x + 10, pw = player.w - 20;
+  const py = player.y - player.h + 8, ph = player.h - 10;
+  const ox = ob.x + 4, ow = ob.w - 8;
+  const oy = ob.y + 2, oh = ob.h - 2;
+  return px < ox + ow && px + pw > ox && py < oy + oh && py + ph > oy;
+}
+
+// GAME STATE ───────────────────────────────────────────────────────────────────
+let state = 'select';
+let score = 0;
+let round = 1;
+let gameSpeed = 4;
+let frame = 0;
+let shakeT = 0;
+let totalLosses = parseInt(localStorage.getItem('sb_losses') || '0');
+const ROUND_SCORES = [0, 400, 1000, 2000, 3500];
+
+function scoreToRound(s) {
+  let r = 1;
+  for (let i = 1; i < ROUND_SCORES.length; i++) {
+    if (s >= ROUND_SCORES[i]) r = i + 1;
+  }
+  return r;
+}
+
+// ANNOUNCEMENTS ────────────────────────────────────────────────────────────────
+const announceEl = document.getElementById('announce');
+const announceText = document.getElementById('announce-text');
+function showAnnounce(text, duration = 1200) {
+  announceText.textContent = text;
+  playRoundSound();
+  bootAudio();
+  if (text.startsWith('ROUND')) playRoundSound(round);
+  announceEl.classList.add('show');
+  clearTimeout(showAnnounce._t);
+  showAnnounce._t = setTimeout(() => announceEl.classList.remove('show'), duration);
+}
+
+// LEADERBOARD ──────────────────────────────────────────────────────────────────
+function loadLB() {
+  try { return JSON.parse(localStorage.getItem('sb_leaderboard') || '[]'); }
+  catch { return []; }
+}
+function saveLB(lb) { localStorage.setItem('sb_leaderboard', JSON.stringify(lb)); }
+function addToLocalLB(playerName, fighterName, scoreVal) {
+  const lb = loadLB();
+  const entry = { player_name: playerName, fighter_name: fighterName, score: scoreVal, round: scoreToRound(scoreVal), ts: Date.now() };
+  lb.push(entry);
+  lb.sort((a, b) => b.score - a.score);
+  const trimmed = lb.slice(0, 10);
+  saveLB(trimmed);
+  return trimmed;
+}
+function sanitizePlayerName(name) {
+  return (name || '').replace(/[^A-Za-z0-9 ]/g, '').trim().slice(0, 12).toUpperCase() || 'UNKNOWN';
+}
+async function submitScore(playerName, fighterName, scoreVal, roundVal) {
+  addToLocalLB(playerName, fighterName, scoreVal);
+  if (!supabaseClient) return { ok: false };
+  try {
+    const { error } = await supabaseClient.from('leaderboard').insert([{
+      player_name: playerName,
+      fighter_name: fighterName,
+      score: scoreVal,
+      round: roundVal
+    }]);
+    if (error) throw error;
+    return { ok: true };
+  } catch (err) {
+    console.warn('Supabase insert failed, local score kept.', err);
+    return { ok: false, error: err };
+  }
+}
+async function fetchLeaderboard() {
+  const local = loadLB();
+  if (!supabaseClient) return local.slice(0, 5);
+  try {
+    const { data, error } = await supabaseClient
+      .from('leaderboard')
+      .select('player_name,fighter_name,score,round,created_at')
+      .order('score', { ascending: false })
+      .limit(5);
+    if (error) throw error;
+    if (Array.isArray(data) && data.length) return data;
+    return local.slice(0, 5);
+  } catch (err) {
+    console.warn('Supabase fetch failed, using local leaderboard.', err);
+    return local.slice(0, 5);
+  }
+}
+async function renderLB(currentEntry = null) {
+  const lb = await fetchLeaderboard();
+  const container = document.getElementById('lb-list');
+  if (!lb.length) {
+    container.innerHTML = '<div class="lb-row"><span class="rank">—</span><span>NO CHAMPIONS YET</span><span></span><span></span></div>';
+    return;
+  }
+  container.innerHTML = lb.map((e, i) => {
+    const playerLabel = e.player_name || e.name || 'UNKNOWN';
+    const fighterLabel = e.fighter_name || '';
+    const scoreLabel = e.score || 0;
+    const roundLabel = e.round || scoreToRound(scoreLabel);
+    const mine = currentEntry && currentEntry.player_name === playerLabel && currentEntry.score === scoreLabel && currentEntry.fighter_name === fighterLabel ? 'mine' : '';
+    return `<div class="lb-row ${mine}">
+      <span class="rank">${i + 1}.</span>
+      <span title="${fighterLabel}">${playerLabel}</span>
+      <span>${scoreLabel}</span>
+      <span style="opacity:0.5">R${roundLabel}</span>
+    </div>`;
+  }).join('');
+}
+
+// MAIN LOOP ────────────────────────────────────────────────────────────────────
+function render() {
+  frame++;
+
+  ctx.save();
+  if (shakeT > 0) {
+    const s = shakeT * 1.5;
+    ctx.translate((Math.random() - 0.5) * s, (Math.random() - 0.5) * s);
+    shakeT--;
+  }
+
+  drawBackground();
+  drawGround();
+
+  if (state === 'playing') {
+    bgScroll += gameSpeed;
+    cityScroll += gameSpeed;
+
+    spawnTimer--;
+    if (spawnTimer <= 0) {
+      spawnObstacle();
+      const baseGap = Math.max(45, 95 - round * 6);
+      spawnTimer = baseGap + Math.random() * 45;
+    }
+
+    obstacles.forEach(ob => ob.x -= gameSpeed);
+    obstacles = obstacles.filter(ob => ob.x > -100);
+
+    for (const ob of obstacles) {
+      if (!ob.hit && checkCollision(ob)) {
+        ob.hit = true;
+        onKnockout();
+        break;
+      }
+    }
+
+    player.update();
+
+    if (frame % 5 === 0) {
+      score++;
+      if (score % 500 === 0) playScoreMilestoneSound();
+      updateHUD();
+      const newRound = scoreToRound(score);
+      if (newRound > round) {
+        round = newRound;
+        showAnnounce(`ROUND ${round}`);
+      }
+    }
+    gameSpeed = 4 + (round - 1) * 0.7 + score * 0.0005;
+  } else if (state === 'ko') {
+    player.update();
+  }
+
+  drawObstacles();
+  updateSteam();
+  player.draw();
+  updateDrawSnow();
+
+  ctx.restore();
+
+  requestAnimationFrame(render);
+}
+
+// HUD ──────────────────────────────────────────────────────────────────────────
+function updateHUD() {
+  document.getElementById('score').textContent = String(score).padStart(4, '0');
+  document.getElementById('round').textContent = round;
+  document.getElementById('losses').textContent = totalLosses;
+}
+
+// KNOCKOUT ─────────────────────────────────────────────────────────────────────
+function onKnockout() {
+  state = 'ko';
+  player.dead = true;
+  shakeT = 14;
+  const w = document.getElementById('wrap');
+  w.classList.add('shake');
+  setTimeout(() => w.classList.remove('shake'), 300);
+  totalLosses++;
+  playKoSound();
+  localStorage.setItem('sb_losses', totalLosses);
+
+  const playerName = sanitizePlayerName(document.getElementById('player-name')?.value);
+  const currentEntry = {
+    player_name: playerName,
+    fighter_name: fighter.name,
+    score: score,
+    round: round
+  };
+  submitScore(playerName, fighter.name, score, round);
+
+  setTimeout(async () => {
+    document.getElementById('ko-title').textContent = score > 0 ? 'KNOCKOUT' : 'COLD START';
+    document.getElementById('ko-sub').textContent = `${fighter.name} FELL IN ROUND ${round}`;
+    document.getElementById('ko-score').textContent = score;
+    const board = await fetchLeaderboard();
+    const best = board[0] ? board[0].score : score;
+    document.getElementById('ko-best').textContent = best;
+    await renderLB(currentEntry);
+    document.getElementById('ko-screen').classList.remove('hidden');
+    document.getElementById('hud').style.display = 'none';
+    document.getElementById('ctrls').style.display = 'none';
+  }, 700);
+}
+
+// SELECT SCREEN ────────────────────────────────────────────────────────────────
+const portraitCanvas = document.getElementById('portrait');
+const portraitCtx = portraitCanvas.getContext('2d');
+portraitCtx.imageSmoothingEnabled = false;
+
+function renderPortrait(f) {
+  portraitCtx.clearRect(0, 0, portraitCanvas.width, portraitCanvas.height);
+  portraitCtx.fillStyle = f.color + '20';
+  portraitCtx.fillRect(0, 0, portraitCanvas.width, portraitCanvas.height);
+  const scale = 5;
+  const sw = f.portrait[0].length * scale;
+  const sh = f.portrait.length * scale;
+  const ox = Math.floor((portraitCanvas.width - sw) / 2);
+  const oy = Math.floor((portraitCanvas.height - sh) / 2) + 4;
+  drawSprite(f.portrait, ox, oy, scale, portraitCtx);
+}
+
+function renderStats(f) {
+  const statsEl = document.getElementById('stats');
+  const bg = f.color;
+  const tc = f.textColor;
+  statsEl.innerHTML = `
+    <div class="stat-row" style="background:${bg};color:${tc}"><span class="k">NAME</span><span class="v">${f.name}</span></div>
+    <div class="stat-row" style="background:${bg};color:${tc}"><span class="k">BIRTHPLACE</span><span class="v">${f.birthplace}</span></div>
+    <div class="stat-row" style="background:${bg};color:${tc}"><span class="k">WEIGHT</span><span class="v">${f.weight}</span></div>
+    <div class="stat-row" style="background:${bg};color:${tc}"><span class="k">MATERIAL</span><span class="v">${f.material}</span></div>
+    <div class="stat-row" style="background:${bg};color:${tc}"><span class="k">LOSSES TO WINTER</span><span class="v">${totalLosses}</span></div>
+  `;
+}
+
+function refreshSelect() {
+  fighter = FIGHTERS[selectedIdx];
+  renderPortrait(fighter);
+  renderStats(fighter);
+}
+
+document.getElementById('prev-fighter').addEventListener('click', () => {
+  selectedIdx = (selectedIdx - 1 + FIGHTERS.length) % FIGHTERS.length;
+  refreshSelect();
+});
+document.getElementById('next-fighter').addEventListener('click', () => {
+  selectedIdx = (selectedIdx + 1) % FIGHTERS.length;
+  refreshSelect();
+});
+
+// START / RESTART ──────────────────────────────────────────────────────────────
+function startGame() {
+  bootAudio();
+  state = 'playing';
+  score = 0;
+  round = 1;
+  gameSpeed = 4;
+  obstacles = [];
+  steam = [];
+  spawnTimer = 90;
+  player.reset();
+
+  document.getElementById('select-screen').classList.add('hidden');
+  document.getElementById('ko-screen').classList.add('hidden');
+  document.getElementById('hud').style.display = 'flex';
+  document.getElementById('ctrls').style.display = 'block';
+  updateHUD();
+  showAnnounce('ROUND 1', 1000);
+}
+
+document.getElementById('start-btn').addEventListener('click', () => { bootAudio(); startGame(); });
+document.getElementById('again-btn').addEventListener('click', () => { bootAudio(); startGame(); });
+document.getElementById('switch-btn').addEventListener('click', () => {
+  document.getElementById('ko-screen').classList.add('hidden');
+  document.getElementById('select-screen').classList.remove('hidden');
+  state = 'select';
+  refreshSelect();
+});
+
+// CONTROLS ─────────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'm' || e.key === 'M') {
+    toggleAudio();
+    return;
+  }
+  if (e.code === 'Space' || e.code === 'ArrowUp') {
+    e.preventDefault();
+    bootAudio();
+    if (state === 'playing') player.jump();
+    else if (state === 'ko') startGame();
+    else if (state === 'select') startGame();
+  } else if (e.code === 'ArrowLeft' && state === 'select') {
+    selectedIdx = (selectedIdx - 1 + FIGHTERS.length) % FIGHTERS.length;
+    refreshSelect();
+  } else if (e.code === 'ArrowRight' && state === 'select') {
+    selectedIdx = (selectedIdx + 1) % FIGHTERS.length;
+    refreshSelect();
+  }
+});
+canvas.addEventListener('click', () => { bootAudio(); if (state === 'playing') player.jump(); else if (state === 'select') startGame(); });
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  bootAudio();
+  bootAudio();
+  if (state === 'playing') player.jump();
+  else if (state === 'select') startGame();
+}, { passive: false });
+
+
+function updateRotatePrompt() {
+  const rotate = document.getElementById('rotate-overlay');
+  const isPortraitMobile = window.innerWidth <= 820 && window.innerHeight > window.innerWidth;
+  rotate.classList.toggle('show', isPortraitMobile);
+  rotate.setAttribute('aria-hidden', isPortraitMobile ? 'false' : 'true');
+}
+window.addEventListener('resize', updateRotatePrompt);
+window.addEventListener('orientationchange', updateRotatePrompt);
+
+// BOOT ─────────────────────────────────────────────────────────────────────────
+refreshSelect();
+updateRotatePrompt();
+updateSoundLabel();
+render();
+</script>
+</body>
+</html>
