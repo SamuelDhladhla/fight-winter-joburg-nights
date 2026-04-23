@@ -1411,7 +1411,7 @@ function render() {
 
     if (frame % 5 === 0) {
       score++;
-      if (score % 500 === 0) playScoreMilestoneSound();
+      if (score % 500 === 0) playMilestoneSound();
       updateHUD();
       const newRound = scoreToRound(score);
       if (newRound > round) {
