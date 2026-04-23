@@ -301,6 +301,223 @@
     z-index: 2; position: relative;
   }
 
+
+  #wrap, canvas {
+    touch-action: manipulation;
+  }
+
+  @media (max-width: 700px) {
+    body {
+      padding: 10px 8px 22px;
+      min-height: 100dvh;
+    }
+
+    .header {
+      max-width: 520px;
+      padding: 2px 4px 10px;
+      font-size: 9px;
+      letter-spacing: 1.5px;
+    }
+
+    .header .logo {
+      font-size: 11px;
+      letter-spacing: 2px;
+    }
+
+    .header .round-badge {
+      padding: 4px 8px;
+      font-size: 9px;
+      white-space: nowrap;
+    }
+
+    #wrap {
+      max-width: 520px;
+      width: 100%;
+      aspect-ratio: 9 / 14;
+      min-height: 76dvh;
+      box-shadow: 6px 6px 0 var(--ink);
+      border-width: 2px;
+    }
+
+    .overlay {
+      padding: 12px 10px;
+    }
+
+    .select-head {
+      font-size: 14px;
+      letter-spacing: 3px;
+      margin-bottom: 6px;
+    }
+
+    .select-main {
+      grid-template-columns: 28px 1fr 28px;
+      gap: 8px;
+      margin-top: 4px;
+      align-items: start;
+    }
+
+    .arrow-btn {
+      width: 28px;
+      height: 42px;
+      font-size: 16px;
+    }
+
+    .fighter-card {
+      grid-template-columns: 1fr;
+      gap: 8px;
+      padding: 0 2px;
+      align-content: start;
+    }
+
+    .fighter-portrait canvas {
+      max-height: 120px !important;
+    }
+
+    .fighter-stats {
+      font-size: 9px !important;
+      gap: 4px;
+    }
+
+    .stat-row {
+      padding: 7px 8px;
+      gap: 4px;
+      font-size: 9px;
+    }
+
+    .start-btn {
+      margin: 10px auto 4px;
+      padding: 12px 18px;
+      font-size: 12px;
+      letter-spacing: 3px;
+      width: min(220px, 100%);
+      box-shadow: 3px 3px 0 var(--red);
+    }
+
+    .select-foot {
+      font-size: 8px;
+      letter-spacing: 2px;
+      line-height: 1.5;
+      padding: 0 8px;
+    }
+
+    .hud {
+      top: 8px;
+      left: 8px;
+      right: 8px;
+      gap: 6px;
+      display: grid !important;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .hud .block {
+      padding: 4px 6px;
+      border-width: 2px;
+      min-width: 0;
+    }
+
+    .hud .block .lbl {
+      font-size: 7px;
+      letter-spacing: 2px;
+    }
+
+    .hud .block .val {
+      font-size: 13px;
+    }
+
+    #announce .banner {
+      padding: 10px 16px;
+      letter-spacing: 4px;
+      font-size: 20px;
+      border-width: 3px;
+      box-shadow: 0 0 0 3px var(--ink);
+      text-align: center;
+    }
+
+    .ko-title {
+      font-size: 28px;
+      letter-spacing: 4px;
+      margin-top: 8px;
+    }
+
+    .ko-sub {
+      font-size: 9px;
+      letter-spacing: 2px;
+      line-height: 1.4;
+      padding: 0 8px;
+    }
+
+    .ko-stats {
+      grid-template-columns: 1fr;
+      gap: 6px;
+      margin: 10px auto;
+      max-width: none;
+    }
+
+    .ko-stat {
+      padding: 8px;
+    }
+
+    .ko-stat .lbl {
+      font-size: 8px;
+      letter-spacing: 2px;
+    }
+
+    .ko-stat .val {
+      font-size: 18px;
+    }
+
+    .leaderboard {
+      max-width: none;
+      width: 100%;
+      font-size: 9px;
+    }
+
+    .leaderboard h3 {
+      font-size: 9px;
+      letter-spacing: 3px;
+    }
+
+    .lb-row {
+      grid-template-columns: 16px 1fr auto auto;
+      gap: 5px;
+      padding: 4px 5px;
+      font-size: 8px;
+    }
+
+    .btn-row {
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .btn-row .start-btn {
+      width: calc(50% - 6px);
+      min-width: 132px;
+      margin: 0;
+      padding: 10px 12px;
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    .ctrls {
+      bottom: 6px;
+      font-size: 8px;
+      letter-spacing: 2px;
+      line-height: 1.3;
+      padding: 0 8px;
+    }
+
+    footer {
+      max-width: 520px;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 4px 0;
+      font-size: 7px;
+      letter-spacing: 2px;
+      text-align: center;
+    }
+  }
+
   @keyframes shake {
     0%,100% { transform: translate(0,0); }
     25% { transform: translate(-4px, 2px); }
@@ -323,6 +540,7 @@
   <div class="hud" id="hud" style="display:none">
     <div class="block"><span class="lbl">SCORE</span><span class="val" id="score">0000</span></div>
     <div class="block round"><span class="lbl">ROUND</span><span class="val" id="round">1</span></div>
+    <div class="block"><span class="lbl">BEANIE</span><span class="val" id="shield">OFF</span></div>
     <div class="block"><span class="lbl">LOSSES TO WINTER</span><span class="val" id="losses">0</span></div>
   </div>
 
@@ -341,7 +559,7 @@
       <button class="arrow-btn" id="next-fighter">►</button>
     </div>
     <button class="start-btn" id="start-btn">FIGHT</button>
-    <div class="select-foot">SPACE · TAP · CLICK TO JUMP · M TO TOGGLE SOUND</div>
+    <div class="select-foot">TAP TO JUMP · DOUBLE JUMP UNLOCKED · M TO TOGGLE SOUND</div>
   </div>
 
   <div class="overlay hidden" id="ko-screen">
@@ -362,7 +580,7 @@
     </div>
   </div>
 
-  <div class="ctrls" id="ctrls" style="display:none">SPACE · TAP · CLICK = JUMP · M = SOUND</div>
+  <div class="ctrls" id="ctrls" style="display:none">TAP ANYWHERE TO JUMP · M = SOUND</div>
 </div>
 
 <footer>
@@ -398,6 +616,8 @@ const PAL = {
   'Y': '#F0C000',
   'I': '#B8D4E8',
   'o': '#FFFFFF',
+  'P': '#C85C8E',
+  'p': '#8D3E63',
 };
 
 // FIGHTER SPRITES ──────────────────────────────────────────────────────────────
@@ -633,6 +853,16 @@ const WIND_GUST = [
   '..IIIIII..IIII...',
 ];
 
+const BEANIE = [
+  '....PPPP....',
+  '...PPPPPP...',
+  '..PPPPPPPP..',
+  '..PppppppP..',
+  '.PPPPPPPPPP.',
+  '.PWWWWWWWWP.',
+  '..PPPPPPPP..',
+];
+
 // SPRITE RENDERER ──────────────────────────────────────────────────────────────
 function drawSprite(sprite, x, y, scale = 3, targetCtx = ctx) {
   for (let row = 0; row < sprite.length; row++) {
@@ -862,6 +1092,8 @@ function updateSteam() {
 // PLAYER ───────────────────────────────────────────────────────────────────────
 const player = {
   x: 80,
+  shield: false,
+  shieldTimer: 0,
   y: GROUND_Y,
   w: 48,
   h: 66,
@@ -883,6 +1115,7 @@ const player = {
   reset() {
     this.y = GROUND_Y; this.vy = 0; this.onGround = true;
     this.jumps = 0; this.dead = false;
+    this.shield = false; this.shieldTimer = 0;
   },
 
   update() {
@@ -895,6 +1128,10 @@ const player = {
       this.vy = 0;
       this.onGround = true;
       this.jumps = 0;
+    }
+    if (this.shieldTimer > 0) {
+      this.shieldTimer--;
+      if (this.shieldTimer <= 0) this.shield = false;
     }
     if (state === 'playing' && this.onGround) this.legFrame += 0.3;
   },
@@ -917,14 +1154,26 @@ const player = {
       drawSprite(runSprite, -this.w/2, -spriteH/2, 3);
       ctx.restore();
     } else {
+      if (this.shield) {
+        ctx.strokeStyle = 'rgba(200,92,142,0.6)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(this.x + this.w/2, this.y - spriteH/2, 28, 40, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
       drawSprite(runSprite, this.x, this.y - spriteH, 3);
+      if (this.shield) {
+        drawSprite(BEANIE, this.x + 12, this.y - spriteH - 8, 2);
+      }
     }
   }
 };
 
 // OBSTACLES ────────────────────────────────────────────────────────────────────
 let obstacles = [];
+let pickups = [];
 let spawnTimer = 90;
+let pickupTimer = 260;
 
 function spawnObstacle() {
   const types = round === 1
@@ -993,6 +1242,36 @@ function drawTaxiSlush(ob) {
     ctx.fillRect(sx, GROUND_Y - 4 - i, 6, 2);
     ctx.fillRect(sx - 4, GROUND_Y - 2 + i, 5, 2);
   }
+}
+
+
+function spawnPickup() {
+  pickups.push({
+    type: 'beanie',
+    x: CW + 20,
+    y: GROUND_Y - (70 + Math.random() * 38),
+    w: 24,
+    h: 18,
+    hit: false
+  });
+}
+
+function drawPickups() {
+  pickups.forEach(p => {
+    if (p.type === 'beanie') {
+      drawSprite(BEANIE, p.x, p.y, 2.5);
+      ctx.fillStyle = 'rgba(200,92,142,0.2)';
+      ctx.beginPath();
+      ctx.arc(p.x + 14, p.y + 8, 12, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+}
+
+function checkPickupCollision(p) {
+  const px = player.x + 10, pw = player.w - 20;
+  const py = player.y - player.h + 8, ph = player.h - 10;
+  return px < p.x + p.w && px + pw > p.x && py < p.y + p.h && py + ph > p.y;
 }
 
 function drawObstacles() {
@@ -1097,6 +1376,11 @@ function playScoreMilestoneSound() {
   playTone(520, 0.05, 'triangle', 0.02, 660);
 }
 
+function playBeanieSound() {
+  playTone(620, 0.06, 'triangle', 0.03, 760);
+  setTimeout(() => playTone(820, 0.08, 'triangle', 0.025, 980), 50);
+}
+
 const ROUND_SCORES = [0, 400, 1000, 2000, 3500];
 
 function scoreToRound(s) {
@@ -1176,18 +1460,45 @@ function render() {
       spawnTimer = baseGap + Math.random() * 45;
     }
 
+    pickupTimer--;
+    if (pickupTimer <= 0) {
+      spawnPickup();
+      pickupTimer = 320 + Math.random() * 260;
+    }
+
     obstacles.forEach(ob => ob.x -= gameSpeed);
     obstacles = obstacles.filter(ob => ob.x > -100);
+
+    pickups.forEach(p => p.x -= gameSpeed);
+    pickups = pickups.filter(p => p.x > -60);
+
+    for (const p of pickups) {
+      if (!p.hit && checkPickupCollision(p)) {
+        p.hit = true;
+        player.shield = true;
+        player.shieldTimer = 420;
+        playBeanieSound();
+        showAnnounce('BEANIE UP', 700);
+      }
+    }
+    pickups = pickups.filter(p => !p.hit);
 
     for (const ob of obstacles) {
       if (!ob.hit && checkCollision(ob)) {
         ob.hit = true;
-        onKnockout();
-        break;
+        if (player.shield) {
+          player.shield = false;
+          player.shieldTimer = 0;
+          showAnnounce('BLOCKED', 650);
+        } else {
+          onKnockout();
+          break;
+        }
       }
     }
 
     player.update();
+    updateHUD();
 
     if (frame % 5 === 0) {
       score++;
@@ -1204,6 +1515,7 @@ function render() {
     player.update();
   }
 
+  drawPickups();
   drawObstacles();
   updateSteam();
   player.draw();
@@ -1218,6 +1530,7 @@ function render() {
 function updateHUD() {
   document.getElementById('score').textContent = String(score).padStart(4, '0');
   document.getElementById('round').textContent = round;
+  document.getElementById('shield').textContent = player.shield ? 'ON' : 'OFF';
   document.getElementById('losses').textContent = totalLosses;
 }
 
@@ -1304,8 +1617,10 @@ function startGame() {
   round = 1;
   gameSpeed = 4;
   obstacles = [];
+  pickups = [];
   steam = [];
   spawnTimer = 90;
+  pickupTimer = 260;
   player.reset();
 
   document.getElementById('select-screen').classList.add('hidden');
